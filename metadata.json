@@ -1,0 +1,6 @@
+{
+  "name": "Calendar of Your Life",
+  "description": "Visualize o tempo de sua vida em uma única grade elegante de meses, salvando seus dados localmente.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
