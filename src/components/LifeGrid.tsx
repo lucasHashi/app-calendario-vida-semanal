@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback, memo } from 'react';
 import { GridCell, LifeGridData } from '../types';
 import { useLifeGrid } from '../hooks/useLifeGrid';
 import { GridCellComponent } from './GridCell';
@@ -24,17 +24,17 @@ export function LifeGrid({ birthdate, lifeExpectancy, userName, onClear }: LifeG
   const percentageLived = Math.min(((livedWeeks / totalWeeks) * 100), 100);
   const percentageLivedStr = percentageLived.toFixed(1);
 
-  const handleCellHover = (cell: GridCell | null, element: HTMLElement) => {
+  const handleCellHover = useCallback((cell: GridCell | null, element: HTMLElement) => {
     if (cell) {
       setHoveredCell(cell);
       setActiveRect(element.getBoundingClientRect());
     }
-  };
+  }, []);
 
-  const handleCellLeave = () => {
+  const handleCellLeave = useCallback(() => {
     setHoveredCell(null);
     setActiveRect(null);
-  };
+  }, []);
 
   const getGreeting = () => {
     if (userName) {
@@ -193,41 +193,15 @@ export function LifeGrid({ birthdate, lifeExpectancy, userName, onClear }: LifeG
 
           {/* Grid rows mapping */}
           <div id="grid-rows-y-axis" className="space-y-1.5">
-            {cells.map((rowCells, yIdx) => {
-              const rowCalendarYear = rowCells[0].date.getFullYear();
-
-              return (
-                <div key={yIdx} className="grid grid-cols-[4.2rem_1fr] gap-3 items-center">
-                  
-                  {/* Y-Axis Label - Displays calendar year only */}
-                  <div 
-                    className="text-neutral-900 border-l-2 border-[#1A1A1A] pl-1.5 flex flex-col justify-center leading-none"
-                  >
-                    <span className="text-neutral-950 font-mono text-[9.5px] font-bold">{rowCalendarYear}</span>
-                  </div>
-
-                  {/* 52 Weekly Cells */}
-                  <div 
-                    style={{
-                      display: 'grid',
-                      gridTemplateColumns: 'repeat(52, minmax(0, 1fr))',
-                      gap: '2.5px',
-                    }}
-                  >
-                    {rowCells.map((cell, wIdx) => (
-                      <GridCellComponent
-                        key={wIdx}
-                        cell={cell}
-                        onHover={handleCellHover}
-                        onLeave={handleCellLeave}
-                        indexInLine={wIdx}
-                      />
-                    ))}
-                  </div>
-
-                </div>
-              );
-            })}
+            {cells.map((rowCells, yIdx) => (
+              <LifeGridRow
+                key={yIdx}
+                rowCells={rowCells}
+                yIdx={yIdx}
+                handleCellHover={handleCellHover}
+                handleCellLeave={handleCellLeave}
+              />
+            ))}
           </div>
 
         </div>
@@ -252,3 +226,51 @@ export function LifeGrid({ birthdate, lifeExpectancy, userName, onClear }: LifeG
     </div>
   );
 }
+
+interface LifeGridRowProps {
+  rowCells: GridCell[];
+  yIdx: number;
+  handleCellHover: (cell: GridCell | null, element: HTMLElement) => void;
+  handleCellLeave: () => void;
+}
+
+const LifeGridRow = memo(function LifeGridRow({
+  rowCells,
+  yIdx,
+  handleCellHover,
+  handleCellLeave,
+}: LifeGridRowProps) {
+  const rowCalendarYear = rowCells[0].date.getFullYear();
+
+  return (
+    <div className="grid grid-cols-[4.2rem_1fr] gap-3 items-center">
+      
+      {/* Y-Axis Label - Displays calendar year only */}
+      <div 
+        className="text-neutral-900 border-l-2 border-[#1A1A1A] pl-1.5 flex flex-col justify-center leading-none"
+      >
+        <span className="text-neutral-950 font-mono text-[9.5px] font-bold">{rowCalendarYear}</span>
+      </div>
+
+      {/* 52 Weekly Cells */}
+      <div 
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(52, minmax(0, 1fr))',
+          gap: '2.5px',
+        }}
+      >
+        {rowCells.map((cell, wIdx) => (
+          <GridCellComponent
+            key={wIdx}
+            cell={cell}
+            onHover={handleCellHover}
+            onLeave={handleCellLeave}
+            indexInLine={wIdx}
+          />
+        ))}
+      </div>
+
+    </div>
+  );
+});

@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useLayoutEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { GridCell } from '../types';
 import { calculateDetailedAge } from '../utils/dateCalc';
 
@@ -11,31 +12,43 @@ interface TooltipProps {
 export function Tooltip({ cell, targetRect, birthdate }: TooltipProps) {
   const [coords, setCoords] = useState({ top: 0, left: 0 });
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!targetRect) return;
 
-    // Approximate size of tooltip
-    const tooltipWidth = 220;
-    const tooltipHeight = 110;
+    // Approximate/actual size of tooltip (measured from DOM if available)
+    const tooltipElement = document.getElementById('life-grid-tooltip');
+    let tooltipWidth = 230;
+    let tooltipHeight = 165; // realistic height estimate of this card
+
+    if (tooltipElement) {
+      const rect = tooltipElement.getBoundingClientRect();
+      if (rect.width) tooltipWidth = rect.width;
+      if (rect.height) tooltipHeight = rect.height;
+    }
 
     const scrollY = window.scrollY;
     const scrollX = window.scrollX;
 
-    let top = targetRect.top + scrollY - tooltipHeight - 10;
-    let left = targetRect.left + scrollX + targetRect.width / 2 - tooltipWidth / 2;
+    // Position diagonally: default to top-right of the dot
+    let left = targetRect.right + scrollX + 8;
+    let top = targetRect.top + scrollY - tooltipHeight - 8;
 
-    // Viewport overflow prevention
-    if (left < 12) {
-      left = 12;
-    }
-    const maxLeft = window.innerWidth - tooltipWidth - 12;
-    if (left > maxLeft) {
-      left = maxLeft;
+    // Viewport overflow prevention (right edge)
+    if (left + tooltipWidth > window.innerWidth + scrollX - 12) {
+      // Flip to top-left of the dot
+      left = targetRect.left + scrollX - tooltipWidth - 8;
     }
 
+    // Viewport overflow prevention (left edge)
+    if (left < scrollX + 12) {
+      // Clamped fallback to center alignment above the dot
+      left = Math.max(scrollX + 12, targetRect.left + scrollX + targetRect.width / 2 - tooltipWidth / 2);
+    }
+
+    // Viewport overflow prevention (top edge)
     if (top < scrollY + 12) {
-      // Render below the cell instead
-      top = targetRect.bottom + scrollY + 10;
+      // Flip to below the dot (keeps left/right diagonal orientation)
+      top = targetRect.bottom + scrollY + 8;
     }
 
     setCoords({ top, left });
@@ -86,7 +99,7 @@ export function Tooltip({ cell, targetRect, birthdate }: TooltipProps) {
     statusBadgeStyles = 'bg-neutral-100 border-neutral-200 text-neutral-650';
   }
 
-  return (
+  return createPortal(
     <div
       id="life-grid-tooltip"
       style={{
@@ -125,6 +138,7 @@ export function Tooltip({ cell, targetRect, birthdate }: TooltipProps) {
           Ano de vida {cell.year} · Coluna {cell.week}
         </p>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

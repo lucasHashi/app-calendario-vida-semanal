@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { GridCell } from '../types';
 
 interface GridCellProps {
@@ -9,7 +9,7 @@ interface GridCellProps {
   indexInLine: number;
 }
 
-export function GridCellComponent({ cell, onHover, onLeave, indexInLine }: GridCellProps) {
+export const GridCellComponent = memo(function GridCellComponent({ cell, onHover, onLeave, indexInLine }: GridCellProps) {
   const { year, week, date, status } = cell;
 
   // Render a simpler non-interactive empty circle for future weeks to optimize DOM and hover performance
@@ -64,4 +64,4 @@ export function GridCellComponent({ cell, onHover, onLeave, indexInLine }: GridC
       className={`w-2.5 h-2.5 md:w-3 md:h-3 rounded-full outline-none transition-all duration-150 ease-out flex-shrink-0 cursor-crosshair ${cellClass}`}
     />
   );
-}
+});

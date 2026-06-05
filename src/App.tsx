@@ -46,18 +46,12 @@ export default function App() {
 
       {/* Elegant Editorial Footer */}
       <footer id="app-main-footer" className="w-full py-6 px-6 border-t border-[#1A1A1A] max-w-6xl mx-auto">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-[10px] uppercase tracking-[0.2em] font-medium text-neutral-600">
-          <p className="max-w-md text-center sm:text-left leading-relaxed">
-            Siga o material completo para manter a integridade dos dados e a privacidade do usuário em seu hardware local.
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-medium text-neutral-600">
+          <p className="max-w-xl text-center sm:text-left leading-relaxed text-[11px] text-neutral-600 normal-case tracking-normal">
+            Feito por: <span className="font-semibold text-neutral-900">Lucas Hashi</span> no tempo livre. A ideia é inspirar a aproveitar o que ainda tem, ter perspectiva do todo é bom pra valorizar o que resta.
           </p>
-          <div className="flex items-center gap-6">
-            <div className="text-right">
-              <div className="text-xs font-bold uppercase text-neutral-900">Build v1.0.4</div>
-              <div className="text-[9px] text-neutral-450 tracking-wide font-mono">Stable Local Deployment</div>
-            </div>
-            <div className="w-10 h-10 rounded-full border border-[#1A1A1A] flex items-center justify-center font-serif italic text-sm font-semibold text-neutral-900 bg-[#EBE7DF]">
-              C
-            </div>
+          <div className="text-center sm:text-right text-[10px] uppercase tracking-[0.15em] font-mono text-neutral-500">
+            Última atualização: <span className="font-sans font-bold text-neutral-900 normal-case tracking-normal text-xs ml-1">06/06/2026</span>
           </div>
         </div>
       </footer>
